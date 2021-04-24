@@ -1,6 +1,6 @@
-package com.rakeshd.retailetl.refinedzone.reader
+package com.rakeshd.retailetl.refinedzone.input_handler
 
-import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.{FileStatus, Path}
 import org.apache.log4j.Logger
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
@@ -18,7 +18,7 @@ abstract class FileReader {
    * @param inputPath
    * @return
    */
-  def readFiles(sparkSession: SparkSession, inputPath: String): DataFrame
+  def readFiles(sparkSession: SparkSession, inputPath: String): Option[DataFrame]
 
   /**
    * This methold move all files from source folder to destination folder.
@@ -44,5 +44,16 @@ abstract class FileReader {
       }
     }
     return true
+  }
+
+  def isFilePresent(sparkSession: SparkSession, srcDir: String, fileExt: String) : Boolean = {
+    val srcPath = new Path(srcDir + File.separator + "*." + fileExt)
+    val fileSystem = srcPath.getFileSystem(sparkSession.sparkContext.hadoopConfiguration)
+    val fileStatuses = fileSystem.globStatus(srcPath)
+
+    if (fileStatuses.length > 0)
+      return true
+    else
+      return false
   }
 }
