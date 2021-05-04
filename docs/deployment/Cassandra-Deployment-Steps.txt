@@ -1,0 +1,7 @@
+Please run below steps from terminal create Cassandra Keyspaces and respective tables.
+1. Change current directory to root of the package:
+    cd <package_root>
+    e.g. cd /home/rakesh/samples/git/retail-etl/refinedzone
+2. Run below commands to create cassandra keyspace and tables.
+cqlsh -f database/cassandra/create-keyspace.cql
+cqlsh -f database/cassandra/customer.cql

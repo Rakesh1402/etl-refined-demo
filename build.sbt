@@ -10,7 +10,8 @@ fork in run := true
 
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
-  "org.apache.spark" %% "spark-sql" % sparkVersion
+  "org.apache.spark" %% "spark-sql" % sparkVersion,
+  "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.13"
 )
 
 
