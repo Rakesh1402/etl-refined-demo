@@ -6,7 +6,9 @@ import org.apache.log4j.Logger
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.col
 
-
+/**
+ * Main Processor class for ETL Refined zone.
+ */
 object MainProcessor {
   private val FIELDS_SEPARATOR = ","
   private val FIELD_MAPPING_SEPARATOR = ":"
@@ -62,6 +64,11 @@ object MainProcessor {
     inputDF.select(selectCols:_*)
   }
 
+  /**
+   * This is main process method - which will perform main transformations/processing.
+   * @param inputDF Input Dataframe
+   * @return Output dataframe
+   */
   def process(inputDF: DataFrame): DataFrame = {
     if(!initialized) {
       logger.error("Main processor:process invoked before initialization...")

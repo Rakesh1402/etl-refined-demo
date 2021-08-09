@@ -3,11 +3,13 @@ package com.rakeshd.retailetl.refinedzone
 import com.datastax.spark.connector.cql.{CassandraConnector, CassandraConnectorConf}
 import com.rakeshd.retailetl.refinedzone.Constants.{APP_NAME, CASSANDRA_HOST_CONFIG_KEY, CUSTOMER_KEYSPACE_NAME_CONFIG_KEY, CUSTOMER_TABLE_NAME_CONFIG_KEY, INPUT_CLUSTER_NAME}
 import com.rakeshd.retailetl.refinedzone.io_handlers.cassandra.CassandraHandler
-import com.rakeshd.retailetl.refinedzone.io_handlers.file.FileHandler
+import com.rakeshd.retailetl.refinedzone.io_handlers.file.{CSVFileReader, FileHandler}
+import com.rakeshd.retailetl.refinedzone.io_handlers.postgres.PostgresHandler
 import com.rakeshd.retailetl.refinedzone.processor.MainProcessor
 import com.rakeshd.retailetl.refinedzone.util.PropertyReaderUtil
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.functions.{col, lit, when}
 import org.apache.spark.sql.cassandra._
 
 import java.util.Properties
@@ -31,7 +33,6 @@ object RefinedMain {
     Logger.getLogger("org").setLevel(Level.ERROR)
     Logger.getLogger("akka").setLevel(Level.ERROR)
     logger.info("Spark session created")
-
     init(sparkSession, args)
     println("Input cassandra host: " + inputCassandraHost)
     sparkSession.setCassandraConf(INPUT_CLUSTER_NAME, CassandraConnectorConf.ConnectionHostParam.option(inputCassandraHost))
@@ -61,11 +62,27 @@ object RefinedMain {
     println("Existing cassandra DF:")
     existingCustomerDF.show(10, false)
 
+    //when(col("test").equalTo(lit(1)))
+    //when(col("x").isNotNull and col("x").equalTo(lit(1)), lit(25)).otherwise(col("par1")) as par1_new
+    //when(col("x").isNotNull and "x" === 1), lit(25)).otherwise(col("par1")) as par1_new
     val normalizedInputDF = MainProcessor.process(inputDF)
     CassandraHandler.writeDF(normalizedInputDF, INPUT_CLUSTER_NAME, customerKeyspace, customerTable)
 
+    //testPostgresInsert(sparkSession)
+    //testPostgresUpdate(sparkSession)
     //FileHandler.moveToHistory(sparkSession)   // TODO: Commented for testing purpose
   }
+
+  /*
+  def testPostgresInsert(sparkSession: SparkSession) = {
+    val inputDFOption = CSVFileReader.readFiles(sparkSession, "/home/rakesh/samples/git/retail-etl/refinedzone/src/main/resources/test-data/products-input/")
+    PostgresHandler.insertTable(inputDFOption.get)
+  }
+
+  def testPostgresUpdate(sparkSession: SparkSession) = {
+    val inputDFOption = CSVFileReader.readFiles(sparkSession, "/home/rakesh/samples/git/retail-etl/refinedzone/src/main/resources/test-data/products-input/")
+    PostgresHandler.updateTable(inputDFOption.get)
+  }*/
 
   def init(sparkSession: SparkSession, args: Array[String]): Unit = {
     if (args.length > 0) {
@@ -81,7 +98,7 @@ object RefinedMain {
     }
 
     PropertyReaderUtil.printProps()
-    if(!FileHandler.init(sparkSession) || !MainProcessor.init()) {
+    if(!FileHandler.init(sparkSession) || !MainProcessor.init() || !PostgresHandler.init()) {
       sparkSession.close()
       throw new IllegalStateException("Failed to initialize...")
     }

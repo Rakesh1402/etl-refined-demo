@@ -57,7 +57,7 @@ object FileHandler {
       throw new IllegalStateException("FileHandler class is not initialized...")
     }
 
-    true
+    initialized
   }
 
   def moveToProcessing(sparkSession: SparkSession): Boolean = {

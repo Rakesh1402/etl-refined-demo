@@ -1,0 +1,41 @@
+1. Refined/CSVProcessor:
+	- read csv files
+	- create mapping of csv file field to destination field
+	- mapping based on values of the multiple fields
+	- validate data types of input data -- in case of invalid value -- ignore that record - generate execption record
+	- transfer few fields -- e.g. boolean conversion
+	- store output to cassandra/csv/parquet -- based on configuration
+	- add support of other input formats (excel, xml)
+	- move input file to processed folder (processing, processed)		-- done
+
+output:
+	- store valid data to cassandra
+	- create csv files for bad records [key fields + bad field + bad field value + exception]
+
+retail-etl (com.rakeshd.retail-etl.csvprocessor)
+csvprocessor/refinedzone:
+
+
+- InputHandler:
+	-- FILE
+	-- CASSANDRA
+	-- POSTGRES
+- filehandler:
+	-- moveFiles
+	-- readFiles
+- csvreader
+- xmlreader
+- excelreader
+
+-- FileReader
+	-- moveFiles -- concrete
+	-- readFiles -- abstract
+
+CSVReader: FileReader
+	-- override readFiles
+
+Excelreader: FileReader
+	-- override readFiles
+
+Main:
+	reader = FileReader()

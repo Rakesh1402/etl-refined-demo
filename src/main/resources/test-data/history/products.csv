@@ -1,0 +1,6 @@
+prod_id,prod_name,category,current_qty
+101,xyz shirt,men,10
+102,abc shirt,men,20
+103,xyz trouser,men,14
+104,abc trouser,men,0
+105,def trouser,men,14
